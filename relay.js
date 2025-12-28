@@ -8,6 +8,11 @@ const SECRET = process.env.ROBLOX_SECRET;
 // Queue stored in memory
 let banQueue = [];
 
+// Root endpoint for quick health check
+app.get("/", (req, res) => {
+  res.send("✅ Roblox relay server is running");
+});
+
 app.post("/ban", (req, res) => {
   const { secret, userId, reason } = req.body;
 
