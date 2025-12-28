@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const unbanQueue = [];
 
 app.use(express.json());
 
@@ -33,12 +34,35 @@ app.post("/ban", (req, res) => {
   res.send("Queued");
 });
 
+app.post("/unban", (req, res) => {
+  const { secret, userId } = req.body;
+
+  if (secret !== process.env.ROBLOX_SECRET) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  if (!userId) {
+    return res.status(400).send("Missing userId");
+  }
+
+  unbanQueue.push(String(userId));
+  res.send("Unban queued");
+});
+
 app.get("/bans", (req, res) => {
   if (req.query.secret !== SECRET) {
     return res.status(401).send("Unauthorized");
   }
 
   res.json(banQueue.splice(0, banQueue.length));
+});
+
+app.get("/unbans", (req, res) => {
+  if (req.query.secret !== process.env.ROBLOX_SECRET) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  res.json(unbanQueue.splice(0, unbanQueue.length));
 });
 
 // Render provides PORT
